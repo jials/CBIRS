@@ -7,12 +7,16 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-/*path of the dataset, and the size of search result could be changed here*/
+/*path of the data set , and the size of search result could be changed here*/
 
 
 public class ImageSearch extends JFrame
                               implements ActionListener {
-    JFileChooser fc;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1466747296908473900L;
+	JFileChooser fc;
 	JPanel contentPane;
 
 	int resultsize = 9;    //size of the searching result
@@ -127,6 +131,7 @@ public class ImageSearch extends JFrame
 
     public static void main(String[] args) {
     	
+		@SuppressWarnings("unused")
 		ImageSearch example = new ImageSearch();
     }
 }

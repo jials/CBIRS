@@ -6,7 +6,11 @@ import java.io.File;
 
 public class ImagePreview extends JComponent
                           implements PropertyChangeListener {
-    ImageIcon thumbnail = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -9042425089855763801L;
+	ImageIcon thumbnail = null;
     File file = null;
 
     public ImagePreview(JFileChooser fc) {
