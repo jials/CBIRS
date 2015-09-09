@@ -20,7 +20,7 @@ public class ImageSearch extends JFrame
 	JPanel contentPane;
 
 	int resultsize = 9;    //size of the searching result
-	String datasetpath = "D:\\assignment_1\\Assignment1\\ImageData\\train\\data\\bear"; //the path of image dataset
+	String datasetpath = "ImageData/train/data/bear"; //the path of image dataset
     ColorHist colorhist = new ColorHist();
     JButton openButton, searchButton;
 	BufferedImage bufferedimage;
