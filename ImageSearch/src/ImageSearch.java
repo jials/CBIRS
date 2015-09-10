@@ -146,6 +146,8 @@ public class ImageSearch extends JFrame implements ActionListener {
 				imageLabels[i].setIcon(new ImageIcon(imgs[i]));
 
 		} else if (e.getSource() == _textbox) {
+			//to do: text retrieval
+			
 			System.out.println(_textbox.getText());
 		}
 	}
