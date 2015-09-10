@@ -102,6 +102,19 @@ public class ImageSearch extends JFrame implements ActionListener {
 			}
 
 			fc.setSelectedFile(null);
+			
+			//slow method
+			try {
+				bufferedimage = ImageIO.read(file);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			for (int i = 0; i < imageLabels.length; i++)
+				imageLabels[i].setIcon(null);
+			imageLabels[0].setIcon(new ImageIcon(bufferedimage));
+			
 		} else if (e.getSource() == searchButton) {
 
 			try {
