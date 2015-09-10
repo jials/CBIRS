@@ -26,6 +26,8 @@ public class ImageSearch extends JFrame implements ActionListener {
 	JLabel[] imageLabels = new JLabel[resultsize];
 
 	File file = null;
+	
+	JTextField _textbox;
 
 	public ImageSearch() {
 
@@ -35,7 +37,15 @@ public class ImageSearch extends JFrame implements ActionListener {
 
 		searchButton = new JButton("Search");
 		searchButton.addActionListener(this);
+		
+		
+		//textbox panel
+		_textbox = new JTextField("Search", 50);
+		_textbox.addActionListener(this);
 
+		JPanel textPanel = new JPanel();
+		textPanel.add(_textbox);
+		
 		// For layout purposes, put the buttons in a separate panel
 		JPanel buttonPanel = new JPanel(); // use FlowLayout
 		buttonPanel.add(openButton);
@@ -53,8 +63,9 @@ public class ImageSearch extends JFrame implements ActionListener {
 		setSize(800, 900);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		contentPane.add(buttonPanel, BorderLayout.PAGE_START);
-		contentPane.add(imagePanel, BorderLayout.CENTER);
+		contentPane.add(textPanel, BorderLayout.PAGE_START);
+		contentPane.add(buttonPanel, BorderLayout.CENTER);
+		contentPane.add(imagePanel, BorderLayout.PAGE_END);
 
 		contentPane.setVisible(true);
 		setVisible(true);
@@ -134,6 +145,8 @@ public class ImageSearch extends JFrame implements ActionListener {
 			for (int i = 0; i < imageLabels.length; i++)
 				imageLabels[i].setIcon(new ImageIcon(imgs[i]));
 
+		} else if (e.getSource() == _textbox) {
+			System.out.println(_textbox.getText());
 		}
 	}
 
