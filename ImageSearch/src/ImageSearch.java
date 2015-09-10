@@ -40,14 +40,13 @@ public class ImageSearch extends JFrame implements ActionListener {
 		
 		
 		//textbox panel
-		_textbox = new JTextField("Search", 50);
+		_textbox = new JTextField("Search", 30);
 		_textbox.addActionListener(this);
 
-		JPanel textPanel = new JPanel();
-		textPanel.add(_textbox);
 		
 		// For layout purposes, put the buttons in a separate panel
 		JPanel buttonPanel = new JPanel(); // use FlowLayout
+		buttonPanel.add(_textbox);
 		buttonPanel.add(openButton);
 		buttonPanel.add(searchButton);
 
@@ -63,9 +62,8 @@ public class ImageSearch extends JFrame implements ActionListener {
 		setSize(800, 900);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		contentPane.add(textPanel, BorderLayout.PAGE_START);
-		contentPane.add(buttonPanel, BorderLayout.CENTER);
-		contentPane.add(imagePanel, BorderLayout.PAGE_END);
+		contentPane.add(buttonPanel, BorderLayout.PAGE_START);
+		contentPane.add(imagePanel, BorderLayout.CENTER);
 
 		contentPane.setVisible(true);
 		setVisible(true);
