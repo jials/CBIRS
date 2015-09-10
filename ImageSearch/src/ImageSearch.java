@@ -17,8 +17,21 @@ public class ImageSearch extends JFrame implements ActionListener {
 	JPanel contentPane;
 
 	int resultsize = 9; // size of the searching result
-	String datasetpath = "ImageData/train/data/bear"; // the path of image
-														// dataset
+	String datasetpath = "ImageData/train/data/"; // the path of image
+													  // dataset
+	private static final String[] KEYWORDS = {"bear", "birds", "boats",
+										 	  "cars", "cat", "computer", "coral", 
+										 	  "dog",
+										 	  "fish", "flags", "flowers", 
+										 	  "horses", 
+										 	  "leaf", 
+										 	  "plane",
+										 	  "rainbow", "rocks",
+										 	  "sign", "snow",
+										 	  "tiger", "tower", "train", "tree", 
+										 	  "whales", "window",
+										 	  "zebra"};
+	
 	ColorHist colorhist = new ColorHist();
 	JButton openButton, searchButton;
 	BufferedImage bufferedimage;
@@ -134,7 +147,11 @@ public class ImageSearch extends JFrame implements ActionListener {
 			}
 			BufferedImage[] imgs = null;
 			try {
-				imgs = colorhist.search(datasetpath, bufferedimage, resultsize);
+				imgs = colorhist.search(datasetpath + KEYWORDS[0], bufferedimage, resultsize);
+				/*
+				for (int i = 0; i < KEYWORDS.length; i++) {
+					imgs = colorhist.search(datasetpath + KEYWORDS[i], bufferedimage, resultsize);
+				}*/
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
