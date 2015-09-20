@@ -5,6 +5,11 @@ ImageSearch/ImageData/
 Bag-of-Visual-Words-Image/
 
 #################
+## Visual Concept
+#################
+ImageSearch/SemanticFeatures/
+
+#################
 ## Eclipse
 #################
 
