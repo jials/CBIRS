@@ -4,6 +4,11 @@
 ImageSearch/ImageData/
 
 #################
+## Visual Concept
+#################
+ImageSearch/SemanticFeatures/
+
+#################
 ## Eclipse
 #################
 
