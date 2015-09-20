@@ -139,9 +139,23 @@ public class ImageSearch extends JFrame implements ActionListener {
 			imageLabels[0].setIcon(new ImageIcon(bufferedimage));
 			
 		} else if (e.getSource() == searchButton) {
+			BufferedImage[] imgs = null;
+			try {
+				imgs = searchBySift();
 
-			searchBySift();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				return;
+			}
 			//searchByColorHistogram();
+			
+			for (int i = 0; i < imageLabels.length; i++) {
+				if (imgs[i] == null) {
+					continue;
+				}
+				imageLabels[i].setIcon(new ImageIcon(imgs[i]));
+			}
 
 		} else if (e.getSource() == _textbox) {
 			//to do: text retrieval
@@ -150,16 +164,17 @@ public class ImageSearch extends JFrame implements ActionListener {
 		}
 	}
 
-	private void searchBySift() {
+	private BufferedImage[] searchBySift() throws IOException {
 		SiftFeatureComparer sift = SiftFeatureComparer.getObject();
-		sift.searchBySift(file);
+		return sift.searchBySift(file);
 	}
 	
 	/**
+	 * @throws IOException 
 	 * 
 	 */
 	@SuppressWarnings("unused")
-	private void searchByColorHistogram() {
+	private BufferedImage[] searchByColorHistogram() throws IOException {
 		try {
 			bufferedimage = ImageIO.read(file);
 		} catch (IOException e1) {
@@ -167,19 +182,14 @@ public class ImageSearch extends JFrame implements ActionListener {
 			e1.printStackTrace();
 		}
 		BufferedImage[] imgs = null;
-		try {
-			imgs = colorhist.search(datasetpath + KEYWORDS[0], bufferedimage, resultsize);
-			/*
-			for (int i = 0; i < KEYWORDS.length; i++) {
-				imgs = colorhist.search(datasetpath + KEYWORDS[i], bufferedimage, resultsize);
-			}*/
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 
-		for (int i = 0; i < imageLabels.length; i++)
-			imageLabels[i].setIcon(new ImageIcon(imgs[i]));
+		imgs = colorhist.search(datasetpath + KEYWORDS[0], bufferedimage, resultsize);
+		/*
+		for (int i = 0; i < KEYWORDS.length; i++) {
+			imgs = colorhist.search(datasetpath + KEYWORDS[i], bufferedimage, resultsize);
+		}*/
+
+		return imgs;
 	}
 
 	public static void main(String[] args) {
