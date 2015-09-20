@@ -19,10 +19,7 @@ public class ImageSearch extends JFrame implements ActionListener {
 	int resultsize = 9; // size of the searching result
 	String datasetpath = "ImageData/train/data/"; // the path of image
 													  // dataset
-	
-	private static final String PATH_SIFT_FILES = "ImageData/train/";
-	private static final String FILE_CODEBOOK_B = "codebook_b.file";
-	private static final String FILE_SIFT_BINARY = "generate.py";
+
 	private static final String[] KEYWORDS = {"bear", "birds", "boats",
 										 	  "cars", "cat", "computer", "coral", 
 										 	  "dog",
@@ -154,37 +151,8 @@ public class ImageSearch extends JFrame implements ActionListener {
 	}
 
 	private void searchBySift() {
-		File currentDirectory = new File(new File(".").getAbsolutePath());
-		String currentPath = null;
-		
-		try {
-			currentPath = currentDirectory.getCanonicalPath();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			return;
-		}
-		
-		
-		String option = " -c ";
-		String codebookBPath = currentPath + "\\" + PATH_SIFT_FILES + FILE_CODEBOOK_B;
-		
-		String imagePath = file.getAbsolutePath();
-		try {
-			Process process = Runtime.getRuntime().exec("python " + FILE_SIFT_BINARY + option + codebookBPath + " " + imagePath);
-			InputStream is = process.getInputStream();
-			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);
-			String line;
-
-			while ((line = br.readLine()) != null) {
-			  System.out.println(line);
-			}
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		SiftFeatureComparer sift = SiftFeatureComparer.getObject();
+		sift.searchBySift(file);
 	}
 	
 	/**
