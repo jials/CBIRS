@@ -1,3 +1,4 @@
+package recognition;
 
 import javax.swing.*;
 import java.beans.*;

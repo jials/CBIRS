@@ -1,3 +1,4 @@
+package recognition;
 
 import java.io.File;
 import javax.swing.ImageIcon;
