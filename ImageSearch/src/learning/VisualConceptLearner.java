@@ -1,13 +1,24 @@
 package learning;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Scanner;
 
 public class VisualConceptLearner {
+	
+	private static final String PATH_PYTHON_LEARNER = "VisualConceptLearner.py";
+	private static final String PATH_PYTHON_FPGENERATOR = "FilepathsGenerator.py";
+	private static final String PATH_TRAIN = "ImageData/train/data";
+	private static final String PATH_OUTPUT_DICT = "ImageData/train/dictionary.txt";
+	private static final String PATH_OUTPUT_FPATHS = "SemanticFeature/data.txt";
+	
 	public void classifyDatabase() {
+		generateFilepaths();
 		try {
 			Process classification = new ProcessBuilder(
 					"SemanticFeature/image_classification.exe", "data.txt")
@@ -15,7 +26,23 @@ public class VisualConceptLearner {
 		} catch (IOException e) {
 			System.out.println("Error calling image_classification.exe");
 		}
-		getPositiveScoreIndex();
+		generateVisualConceptDict();
+	}
+
+	private void generateFilepaths() {
+		try {
+			Process process = Runtime.getRuntime().exec("python " + PATH_PYTHON_FPGENERATOR + " -t " + PATH_TRAIN + " -c " + PATH_OUTPUT_FPATHS);
+			InputStream is = process.getInputStream();
+			InputStreamReader isr = new InputStreamReader(is);
+			BufferedReader br = new BufferedReader(isr);
+			String line;
+			
+			while ((line = br.readLine()) != null) {
+				System.out.println(line);
+			}
+		} catch (IOException e) {
+			System.out.println("Error calling Python FilepathsGenerator script!");
+		}
 	}
 
 	/**
@@ -24,49 +51,19 @@ public class VisualConceptLearner {
 	 * with positive score. Also generate compiled.txt which has all the scores for each
 	 * img
 	 */
-	private void getPositiveScoreIndex() {
-		// http://stackoverflow.com/questions/22347124/how-to-open-all-files-in-a-directory-in-java-read-them-creat-new-files-write
-		String trainPath = "ImageData/train/data";
-		File f = new File(trainPath);
-		String[] fileList = f.list();
-		String compiledString = "";
-		Scanner scanner;
-		BufferedWriter bw;
-
-		for (String str : fileList) {
-			if (str.endsWith(".txt")) {
-				// Read the content of file "str" and store it in some variables
-				int count = 1; // 1-based index
-				String output = "";
-				scanner = new Scanner(trainPath + str);
-
-				while (scanner.hasNextDouble()) {
-					double i = scanner.nextDouble();
-					if (i > 0) {
-						output += count + " ";
-					}
-					count++;
-				}
-				compiledString += str + " " + output + '\n';
-				
-				// now write the content in txt file
-				try {
-					bw = new BufferedWriter(new FileWriter(trainPath + str));
-					bw.write(output); 
-					bw.close();
-				} catch (IOException e) {
-					System.out.println("Cannot find " + trainPath + str);
-				}
-			}
-		}
-		
+	private void generateVisualConceptDict() {
 		try {
-			bw = new BufferedWriter(new FileWriter(trainPath+"compiled.txt"));
-			bw.write(compiledString);
-			bw.close();
+			Process process = Runtime.getRuntime().exec("python " + PATH_PYTHON_LEARNER + " -t " + PATH_TRAIN + " -c " + PATH_OUTPUT_DICT);
+			InputStream is = process.getInputStream();
+			InputStreamReader isr = new InputStreamReader(is);
+			BufferedReader br = new BufferedReader(isr);
+			String line;
+			
+			while ((line = br.readLine()) != null) {
+				System.out.println(line);
+			}
 		} catch (IOException e) {
-			System.out.println("Problem writing compiledString");
+			System.out.println("Error calling Python VisualConceptLearner script!");
 		}
-		
 	}
 }
