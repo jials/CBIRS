@@ -19,6 +19,7 @@ public class ImageSearch extends JFrame implements ActionListener {
 	int resultsize = 9; // size of the searching result
 	String datasetpath = "ImageData/train/data/"; // the path of image
 													  // dataset
+
 	private static final String[] KEYWORDS = {"bear", "birds", "boats",
 										 	  "cars", "cat", "computer", "coral", 
 										 	  "dog",
@@ -138,33 +139,57 @@ public class ImageSearch extends JFrame implements ActionListener {
 			imageLabels[0].setIcon(new ImageIcon(bufferedimage));
 			
 		} else if (e.getSource() == searchButton) {
-
-			try {
-				bufferedimage = ImageIO.read(file);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 			BufferedImage[] imgs = null;
 			try {
-				imgs = colorhist.search(datasetpath + KEYWORDS[0], bufferedimage, resultsize);
-				/*
-				for (int i = 0; i < KEYWORDS.length; i++) {
-					imgs = colorhist.search(datasetpath + KEYWORDS[i], bufferedimage, resultsize);
-				}*/
+				imgs = searchBySift();
+
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
+				return;
 			}
-
-			for (int i = 0; i < imageLabels.length; i++)
+			//searchByColorHistogram();
+			
+			for (int i = 0; i < imageLabels.length; i++) {
+				if (imgs[i] == null) {
+					continue;
+				}
 				imageLabels[i].setIcon(new ImageIcon(imgs[i]));
+			}
 
 		} else if (e.getSource() == _textbox) {
 			//to do: text retrieval
 			
 			System.out.println(_textbox.getText());
 		}
+	}
+
+	private BufferedImage[] searchBySift() throws IOException {
+		SiftFeatureComparer sift = SiftFeatureComparer.getObject();
+		return sift.searchBySift(file);
+	}
+	
+	/**
+	 * @throws IOException 
+	 * 
+	 */
+	@SuppressWarnings("unused")
+	private BufferedImage[] searchByColorHistogram() throws IOException {
+		try {
+			bufferedimage = ImageIO.read(file);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		BufferedImage[] imgs = null;
+
+		imgs = colorhist.search(datasetpath + KEYWORDS[0], bufferedimage, resultsize);
+		/*
+		for (int i = 0; i < KEYWORDS.length; i++) {
+			imgs = colorhist.search(datasetpath + KEYWORDS[i], bufferedimage, resultsize);
+		}*/
+
+		return imgs;
 	}
 
 	public static void main(String[] args) {
