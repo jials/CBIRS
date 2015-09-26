@@ -29,7 +29,7 @@ def build(training_dir, output_file):
 				# output = [i for (i,j) in output]
 				# print output
 				for index, score in output:
-					conceptId_to_nameScore[index].append((os.path.basename(filepath), score))
+					conceptId_to_nameScore[index].append((filepath, score))
 					if index not in conceptId:
 						conceptId.append(index)
 
@@ -39,7 +39,8 @@ def build(training_dir, output_file):
 				f.write("\n")
 			else:
 				for index, score in conceptId_to_nameScore[index]:
-					f.write(str(index) + " " + str(score) + " ")
+					f.write(str(index) + " ")
+					# f.write(str(index) + " " + str(score) + " ")
 				f.write("\n")
 
 
