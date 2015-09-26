@@ -186,8 +186,6 @@ public class SiftFeatureComparer {
 		
 		TreeSet <Integer> curImageSet = generateCurImageSet();
 		
-		System.out.println(curImageSet.size());
-
 		Vector <Integer> topKnnImages = findNearestImages(curImageSet);
 		
 		BufferedImage[] imgs = new BufferedImage[TOP_KNN];

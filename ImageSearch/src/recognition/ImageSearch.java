@@ -51,8 +51,7 @@ public class ImageSearch extends JFrame implements ActionListener {
 		openButton.addActionListener(this);
 
 		searchButton = new JButton("Search");
-		searchButton.addActionListener(this);
-		
+		searchButton.addActionListener(this);		
 		
 		//textbox panel
 		_textbox = new JTextField("Search", 30);
@@ -140,10 +139,23 @@ public class ImageSearch extends JFrame implements ActionListener {
 			imageLabels[0].setIcon(new ImageIcon(bufferedimage));
 			
 		} else if (e.getSource() == searchButton) {
+			if (file == null) {
+				return;
+			}
+			
 			BufferedImage[] imgs = null;
 			try {
-				imgs = searchBySift();
-
+				boolean isSift = false;
+				
+				if (isSift) {
+					imgs = searchBySift();
+				} else {
+					imgs = searchByText();
+				}
+				
+				if (imgs == null) {
+					return;
+				}
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -157,6 +169,8 @@ public class ImageSearch extends JFrame implements ActionListener {
 				}
 				imageLabels[i].setIcon(new ImageIcon(imgs[i]));
 			}
+			
+			file = null;
 
 		} else if (e.getSource() == _textbox) {
 			//to do: text retrieval
@@ -168,6 +182,11 @@ public class ImageSearch extends JFrame implements ActionListener {
 	private BufferedImage[] searchBySift() throws IOException {
 		SiftFeatureComparer sift = SiftFeatureComparer.getObject();
 		return sift.searchBySift(file);
+	}
+	
+	private BufferedImage[] searchByText() throws IOException {
+		TextRecognizer textRecognizer = TextRecognizer.getObject();
+		return textRecognizer.searchByText(file);
 	}
 	
 	/**
