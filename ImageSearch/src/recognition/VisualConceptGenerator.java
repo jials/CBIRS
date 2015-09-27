@@ -33,32 +33,53 @@ public class VisualConceptGenerator {
 	}
 	
 	public TreeSet<String> getTreeSetResultImageList(File file) {
-		String filePath = file.getAbsolutePath();
-		BufferedWriter bw;
-		try {
-			bw = new BufferedWriter(new FileWriter("SemanticFeature/input.txt"));
-			bw.write(filePath);
-			bw.close();
-		} catch (IOException e) {
-			System.out.println("Error writing filepath of image into SemanticFeature/input.txt");
+		if (!processResult(file)) {
+			return null;
 		}
-		
-		try {
-			@SuppressWarnings("unused")
-			Process classification = new ProcessBuilder(
-					"SemanticFeature/image_classification.exe", "input.txt")
-					.start();
-		} catch (IOException e) {
-			System.out.println("Error calling image_classification.exe");
-		}
-		
-		generateResult(filePath);
 		
 		TreeSet <String> treeSetResultImageList = new TreeSet <String>();
 		for (int i = 0; i < _results.size(); i++) {
 			treeSetResultImageList.add(_results.get(i));
 		}
+		
 		return treeSetResultImageList;
+
+	}
+
+	/**
+	 * @param file
+	 */
+	public boolean processResult(File file) {
+		String filePath = file.getAbsolutePath();
+		BufferedWriter bw;
+		try {
+			bw = new BufferedWriter(new FileWriter("semanticFeature/input.txt"));
+			bw.write(filePath);
+			bw.close();
+		} catch (IOException e) {
+			System.out.println("Error writing filepath of image into semanticFeature/input.txt");
+			return false;
+		}
+		
+		try {
+			Process classification = Runtime.getRuntime().exec("semanticFeature/image_classification.exe input.txt", null, 
+					new File("semanticFeature/"));
+			InputStream is = classification.getInputStream();
+			InputStreamReader isr = new InputStreamReader(is);
+			BufferedReader br = new BufferedReader(isr);
+			String line;
+			
+			while ((line = br.readLine()) != null) {
+				System.out.println(line);
+			}
+			generateResult(filePath);
+
+		} catch (IOException e) {
+			System.out.println("Error calling image_classification.exe");
+			return false;
+		}
+		
+		return true;
 	}
 	
 	/**
@@ -68,26 +89,10 @@ public class VisualConceptGenerator {
 	 * @throws IOException 
 	 */
 	public BufferedImage[] classifyInputImage(File file) throws IOException {
-		String filePath = file.getAbsolutePath();
-		BufferedWriter bw;
-		try {
-			bw = new BufferedWriter(new FileWriter("SemanticFeature/input.txt"));
-			bw.write(filePath);
-			bw.close();
-		} catch (IOException e) {
-			System.out.println("Error writing filepath of image into SemanticFeature/input.txt");
+		if (!processResult(file)) {
+			return null;
 		}
-		
-		try {
-			@SuppressWarnings("unused")
-			Process classification = new ProcessBuilder(
-					"SemanticFeature/image_classification.exe", "input.txt")
-					.start();
-		} catch (IOException e) {
-			System.out.println("Error calling image_classification.exe");
-		}
-		
-		generateResult(filePath);
+
 		
 		BufferedImage imgs[] = new BufferedImage[TOP_20_RESULTS];
 		for (int i = 0; i < _results.size(); i++) {

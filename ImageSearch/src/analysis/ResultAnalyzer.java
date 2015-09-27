@@ -419,7 +419,7 @@ public class ResultAnalyzer {
 		TextRecognizer text = TextRecognizer.getObject();
 		SiftFeatureComparer sift = SiftFeatureComparer.getObject();
 				
-		/*
+		
 		analyzer.writeToResultFile("#analyzing using concepts only\n\n");
 		
 		for (int i = 0; i < testImages.size(); i++) {
@@ -434,6 +434,7 @@ public class ResultAnalyzer {
 			analyzer.generateAnalysisResult(file, resultImageSet);
 		}
 		
+		/*
 		analyzer.writeToResultFile("\n\n\n#analyzing using text only\n\n");
 		
 		for (int i = 0; i < testImages.size(); i++) {
@@ -447,7 +448,7 @@ public class ResultAnalyzer {
 			
 			analyzer.generateAnalysisResult(file, resultImageSet);
 		}
-		*/
+		
 
 		analyzer.writeToResultFile("\n\n\n#analyzing using visual words only\n\n");
 		
@@ -462,7 +463,7 @@ public class ResultAnalyzer {
 			
 			analyzer.generateAnalysisResult(file, resultImageSet);
 		}
-
+		*/
 	}
 	
 }

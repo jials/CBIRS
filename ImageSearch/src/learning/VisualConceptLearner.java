@@ -16,14 +16,7 @@ public class VisualConceptLearner {
 	
 	public void classifyDatabase() {
 		generateFilepaths();
-		try {
-			/*
-			ProcessBuilder builder = new ProcessBuilder("image_classification.exe", "data.txt");
-			builder.directory(new File("semanticFeature/"));
-			System.out.println(builder.directory().getAbsolutePath());
-			Process classification = builder.start();
-			*/
-			
+		try {			
 			Process classification = Runtime.getRuntime().exec("semanticFeature/image_classification.exe data.txt", null, 
 					new File("semanticFeature/"));
 			
