@@ -268,7 +268,8 @@ public class SiftFeatureComparer {
 				if (curImageSet.isEmpty()) {
 					curImageSet.addAll(_setImageOfVisualWords.get(i));
 				} else {
-					curImageSet.retainAll(_setImageOfVisualWords.get(i));
+					//curImageSet.retainAll(_setImageOfVisualWords.get(i));
+					curImageSet.addAll(_setImageOfVisualWords.get(i));
 				}
 			}
 		}

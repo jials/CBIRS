@@ -193,25 +193,34 @@ public class ResultAnalyzer {
 		//2PR/ (P+R)
 		double f1 = 2 * precision * recall / (precision + recall);
 		
-		//Pre = top/down
-		double avgPrecisions = 0;
-		double top = 0;
-		double down = 0;
+		//MAP = sum of i= 1:x of (precision at i * change in recall)
+		/*
+		 * Precision at i is a percentage of correct items among first i recommendations.
+
+Change in recall is 1/x if item at i is correct (for every correct item), 
+otherwise zero. Let’s assume that the number of relevant items is bigger or 
+equal to x: r >= x. If not, change in recall is 1/r for each correct i instead of 1/x.
+		 */
+		int numOfCorrect = 0;
+
 		String resultImagesString = " Result Images:";
-		for (int i = 0; i < Math.min(TOPN, resultImageSet.size()); i++) {
+		int size = Math.min(TOPN, resultImageSet.size());
+		int x = Math.min(size, correctImageSet.size());
+		double avgPrecisions = 0;
+		for (int i = 0; i < size; i++) {
 			String imageName = resultImageSet.pollFirst();
 			resultImagesString += imageName + " ";
+			double changeInRecall = 0;
 			if (correctImageSet.contains(imageName)) {
-				top += 1;
-				down += 1;
-			} else {
-				down += 1;
+				numOfCorrect++;
+				changeInRecall = 1 / (double) (x);
 			}
-			double avgPrecision = top/down;
+			double curPrecision = (double) numOfCorrect / (i + 1);
+			double avgPrecision = curPrecision * changeInRecall;
 			avgPrecisions += avgPrecision;
 		}
 
-		double mapAtTOPN = avgPrecisions / (double) Math.min(TOPN, resultImageSet.size());
+		double mapAtTOPN = avgPrecisions;
 		
 		StatisticObject object = new StatisticObject(precision, 
 													 recall,
@@ -424,13 +433,11 @@ public class ResultAnalyzer {
 		
 		Vector <String> testImages = analyzer.getTestImageFilePaths(PATH_OUTPUT_FPATHS);
 		
-		//VisualConceptGenerator concept = VisualConceptGenerator.getObject();
-		TextRecognizer text = TextRecognizer.getObject();
-		//SiftFeatureComparer sift = SiftFeatureComparer.getObject();
 				
-		Vector <StatisticObject> statisticalObjectsText = new Vector <StatisticObject>();
 		
 		/*
+		VisualConceptGenerator concept = VisualConceptGenerator.getObject();
+
 		analyzer.writeToResultFile("#analyzing using concepts only\n\n");
 		
 		for (int i = 0; i < testImages.size(); i++) {
@@ -446,7 +453,12 @@ public class ResultAnalyzer {
 		}
 		*/
 
+		/*
 		
+		TextRecognizer text = TextRecognizer.getObject();
+
+		Vector <StatisticObject> statisticalObjectsText = new Vector <StatisticObject>();
+
 		analyzer.writeToResultFile("\n\n\n#analyzing using text only\n\n");
 		
 		for (int i = 0; i < testImages.size(); i++) {
@@ -463,8 +475,13 @@ public class ResultAnalyzer {
 		}
 		String outputLine = AverageAndSdCalculator.getStatisticResult(statisticalObjectsText);
 		analyzer.writeToResultFile(outputLine);
+		*/
 		
-		/*
+
+		SiftFeatureComparer sift = SiftFeatureComparer.getObject();
+		Vector <StatisticObject> statisticalObjectsSift = new Vector <StatisticObject>();
+
+		
 		analyzer.writeToResultFile("\n\n\n#analyzing using visual words only\n\n");
 		
 		for (int i = 0; i < testImages.size(); i++) {
@@ -476,9 +493,12 @@ public class ResultAnalyzer {
 				continue;
 			}
 			
-			analyzer.generateAnalysisResult(file, resultImageSet);
+			StatisticObject object = analyzer.generateAnalysisResult(file, resultImageSet);
+			statisticalObjectsSift.add(object);
 		}
-		*/
+		String outputLine = AverageAndSdCalculator.getStatisticResult(statisticalObjectsSift);
+		analyzer.writeToResultFile(outputLine);
+
 	}
 	
 }
