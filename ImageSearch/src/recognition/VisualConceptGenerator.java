@@ -2,12 +2,10 @@ package recognition;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Scanner;
 
 public class VisualConceptGenerator {
 	private static final String PATH_PYTHON_RESULT = "Result.py";
@@ -29,6 +27,7 @@ public class VisualConceptGenerator {
 		}
 		
 		try {
+			@SuppressWarnings("unused")
 			Process classification = new ProcessBuilder(
 					"SemanticFeature/image_classification.exe", "input.txt")
 					.start();

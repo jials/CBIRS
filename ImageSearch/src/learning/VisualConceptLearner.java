@@ -1,13 +1,9 @@
 package learning;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Scanner;
 
 public class VisualConceptLearner {
 	
@@ -20,6 +16,7 @@ public class VisualConceptLearner {
 	public void classifyDatabase() {
 		generateFilepaths();
 		try {
+			@SuppressWarnings("unused")
 			Process classification = new ProcessBuilder(
 					"SemanticFeature/image_classification.exe", "data.txt")
 					.start();
