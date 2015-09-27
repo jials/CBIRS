@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
@@ -43,7 +44,36 @@ public class TextRecognizer {
 		return _textRecognizer;
 	}
 	
+	public TreeSet<String> getTreeSetResultImageList (File file) {
+		Vector<StringIntegerPair> resultImageList = getVectorResultImageList(file);
+		if (resultImageList == null) {
+			return null;
+		}
+		
+		TreeSet <String> treeSetResultImageList = new TreeSet <String>();
+		for (int i = 0; i < resultImageList.size(); i++) {
+			String imagePath = resultImageList.get(i).getString();
+			treeSetResultImageList.add(imagePath);
+		}
+		return treeSetResultImageList;
+	}
+	
 	public BufferedImage[] searchByText(File file) throws IOException {
+		Vector<StringIntegerPair> resultImageList = getVectorResultImageList(file);
+		if (resultImageList == null) {
+			return null;
+		}
+				
+		BufferedImage[] imgs = extractBufferedImages(resultImageList);
+		
+		return imgs;
+	}
+
+	/**
+	 * @param file
+	 * @return
+	 */
+	private Vector<StringIntegerPair> getVectorResultImageList(File file) {
 		String imageName = extractImageName(file);
 		
 		Vector <String> textsForThisFile = _textFromTest.get(imageName);
@@ -54,10 +84,7 @@ public class TextRecognizer {
 		}
 		
 		Vector <StringIntegerPair> resultImageList = extractResultImageList(textsForThisFile);
-				
-		BufferedImage[] imgs = extractBufferedImages(resultImageList);
-		
-		return imgs;
+		return resultImageList;
 	}
 	
 	public void test() {

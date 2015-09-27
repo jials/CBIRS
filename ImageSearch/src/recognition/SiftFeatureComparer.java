@@ -177,16 +177,19 @@ public class SiftFeatureComparer {
 		return _sift;
 	}
 	
-	public BufferedImage[] searchBySift(File file) throws IOException {
-		runSiftBinary(file);
-		
-		if (!extractWordHistograms(FILE_GENERATED)){
-			System.err.println("failed to extract word histogram");	
+	public TreeSet<String> getTreeSetResultImageList(File file) {
+		Vector<Integer> topKnnImages = getVectorResultImageList(file);
+		TreeSet<String> treeSetResultImageList = new TreeSet<String>();
+		for (int i = 0; i < topKnnImages.size(); i++) {
+			int index = topKnnImages.get(i).intValue();
+			String imgPath = _imageNames.get(index);
+			treeSetResultImageList.add(imgPath);
 		}
-		
-		TreeSet <Integer> curImageSet = generateCurImageSet();
-		
-		Vector <Integer> topKnnImages = findNearestImages(curImageSet);
+		return treeSetResultImageList;
+	}
+	 
+	public BufferedImage[] searchBySift(File file) throws IOException {
+		Vector<Integer> topKnnImages = getVectorResultImageList(file);
 		
 		BufferedImage[] imgs = new BufferedImage[TOP_KNN];
 		for (int i = 0; i < topKnnImages.size(); i++) {
@@ -196,6 +199,23 @@ public class SiftFeatureComparer {
 			imgs[i] = ImageIO.read(imgFile);
 		}
 		return imgs;
+	}
+
+	/**
+	 * @param file
+	 * @return
+	 */
+	private Vector<Integer> getVectorResultImageList(File file) {
+		runSiftBinary(file);
+		
+		if (!extractWordHistograms(FILE_GENERATED)){
+			System.err.println("failed to extract word histogram");	
+		}
+		
+		TreeSet <Integer> curImageSet = generateCurImageSet();
+		
+		Vector <Integer> topKnnImages = findNearestImages(curImageSet);
+		return topKnnImages;
 	}
 
 	/**

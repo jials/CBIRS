@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
@@ -29,6 +30,35 @@ public class VisualConceptGenerator {
 			_concepts = new VisualConceptGenerator();
 		}
 		return _concepts;
+	}
+	
+	public TreeSet<String> getTreeSetResultImageList(File file) {
+		String filePath = file.getAbsolutePath();
+		BufferedWriter bw;
+		try {
+			bw = new BufferedWriter(new FileWriter("SemanticFeature/input.txt"));
+			bw.write(filePath);
+			bw.close();
+		} catch (IOException e) {
+			System.out.println("Error writing filepath of image into SemanticFeature/input.txt");
+		}
+		
+		try {
+			@SuppressWarnings("unused")
+			Process classification = new ProcessBuilder(
+					"SemanticFeature/image_classification.exe", "input.txt")
+					.start();
+		} catch (IOException e) {
+			System.out.println("Error calling image_classification.exe");
+		}
+		
+		generateResult(filePath);
+		
+		TreeSet <String> treeSetResultImageList = new TreeSet <String>();
+		for (int i = 0; i < _results.size(); i++) {
+			treeSetResultImageList.add(_results.get(i));
+		}
+		return treeSetResultImageList;
 	}
 	
 	/**

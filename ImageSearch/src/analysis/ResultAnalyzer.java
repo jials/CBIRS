@@ -5,10 +5,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
+
+import recognition.SiftFeatureComparer;
+import recognition.TextRecognizer;
+import recognition.VisualConceptGenerator;
 
 /************
  * 
@@ -45,8 +50,14 @@ public class ResultAnalyzer {
 	
 	private static final String CATEGORY_NAMES = "ImageData/category_names.txt";
 	private static final String groundTruthFileNamesPrefix = "Labels_";
+	private static final String groundTruthFileExtension = ".txt";
 	
 	private static final String RESULT_FILE_NAME = "ResultAnalysis.txt";
+	
+	private static final String PATH_PYTHON_FPGENERATOR = "src/learning/FilepathsGenerator.py";
+	private static final String PATH_TEST_IMAGES = "ImageData/test/data";
+	private static final String PATH_OUTPUT_FPATHS = "ImageData/test/ImagePaths.txt";
+
 	
 	private static final int CHILD_OF_CATEGORY = 1;
 	private static final int TOPN = 20;
@@ -56,8 +67,60 @@ public class ResultAnalyzer {
 	private Vector <String> _imageListOfTrain = null;
 	private TreeMap <String, TreeSet <String>> _categoriesOfImagesTrain = null;
 	
+	
 	//it is an inverted list of category-image
 	private TreeMap <String, Vector <String>> _categoriesOfImagesTest = null;
+
+	
+	private static void generateTestImageFilepaths(String filepath) {
+		try {
+			Process process = Runtime.getRuntime().exec("python " + PATH_PYTHON_FPGENERATOR + " -t " + 
+														PATH_TEST_IMAGES + " -c " + filepath);
+			InputStream is = process.getInputStream();
+			InputStreamReader isr = new InputStreamReader(is);
+			BufferedReader br = new BufferedReader(isr);
+			String line;
+			
+			while ((line = br.readLine()) != null) {
+				System.out.println(line);
+			}
+		} catch (IOException e) {
+			System.out.println("Error calling Python FilepathsGenerator script!");
+		}
+	}
+	
+	public Vector <String> getTestImageFilePaths(String filepath) {
+		Vector <String> imageList = null;
+		try {
+			// Open the file
+			FileInputStream fstream = new FileInputStream(filepath);
+			BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+
+			String image;
+			imageList = new Vector <String>();
+			TreeSet <String> imageNames = new TreeSet<String>();
+
+			//Read File Line By Line
+			while ((image = br.readLine()) != null)   {
+			  // Print the content on the console
+				image = image.trim();
+				
+				String imageName = extractImageName(image);
+				if (!imageNames.contains(imageName)) {
+					imageNames.add(imageName.trim());
+					imageList.add(image);
+				} 
+			}
+			
+			//Close the input stream
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		return imageList;
+	}
 
 	
 	private ResultAnalyzer() {
@@ -76,12 +139,33 @@ public class ResultAnalyzer {
 		initializeCategoriesOfImagesTrain();
 	}
 
-	public boolean generateAnalysisResult(String testImagePath, TreeSet <String> resultImageSet) {
-		String testImageName = extractImageName(testImagePath).trim();
-		String testImageRelativePath = getRelativePath(testImagePath);
+	public boolean generateAnalysisResult(File file, TreeSet <String> resultImageSetInitial) {
+		String testImageRelativePath = null;
+		try {
+			testImageRelativePath = file.getCanonicalPath();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+
+		String testImageName = extractImageName(testImageRelativePath).trim();
+		
+		TreeSet <String> resultImageSet = new TreeSet <String>();
+		while (!resultImageSetInitial.isEmpty()) {
+			String imagePath = resultImageSetInitial.pollFirst();
+			String imageName = extractImageName(imagePath).trim();
+			resultImageSet.add(imageName);
+		}
+		
 		
 		Vector <String> categories = _categoriesOfImagesTest.get(testImageName);
 		TreeSet <String> correctImageSet = new TreeSet <String>();
+	
+		
+		if (categories == null) {
+			return false;
+		}
 		
 		for (int i = 0; i < categories.size(); i++) {
 			String categoryName = categories.get(i);
@@ -89,14 +173,19 @@ public class ResultAnalyzer {
 			correctImageSet.addAll(imagesFromCategory);
 		}
 		
+		System.out.println(resultImageSet);
+		System.out.println(correctImageSet);
+		
 		TreeSet <String> tpSet = new TreeSet <String>();
+				
 		tpSet.addAll(resultImageSet);
 		
-		tpSet.retainAll(correctImageSet);
+		tpSet.retainAll(correctImageSet);		
 		
 		double tp = (double) tpSet.size();
 		double fp = (double) resultImageSet.size() - tp;
 		double fn = (double) correctImageSet.size() - tp;
+		
 		
 		double precission = tp / (tp + fp);
 		double recall = tp / (tp + fn);
@@ -111,7 +200,7 @@ public class ResultAnalyzer {
 		String resultImagesString = " Result Images:";
 		for (int i = 0; i < Math.min(TOPN, resultImageSet.size()); i++) {
 			String imageName = resultImageSet.pollFirst();
-			resultImagesString += imageName;
+			resultImagesString += imageName + " ";
 			if (correctImageSet.contains(imageName)) {
 				top += 1;
 				down += 1;
@@ -121,7 +210,8 @@ public class ResultAnalyzer {
 			double avgPrecission = top/down;
 			avgPrecissions += avgPrecission;
 		}
-		double mapAtTOPN = avgPrecissions / Math.min(TOPN, resultImageSet.size());
+
+		double mapAtTOPN = avgPrecissions / (double) Math.min(TOPN, resultImageSet.size());
 		
 		String outputLine = "Test Image: " + testImageRelativePath +
 				            " Precission: " + precission +
@@ -131,11 +221,23 @@ public class ResultAnalyzer {
 				            " MAP@N: " + mapAtTOPN +
 				            resultImagesString + "\n";
 				            
+		return writeToResultFile(outputLine);
 		
+	}
+
+	/**
+	 * @param line
+	 * @return
+	 */
+	public boolean writeToResultFile(String line) {
+		return writeToResultFile(line, true);
+	}
+
+	public boolean writeToResultFile(String line, boolean isAppend) {
 		FileWriter fw;
 		try {
-			fw = new FileWriter(RESULT_FILE_NAME);
-			fw.write(outputLine);
+			fw = new FileWriter(RESULT_FILE_NAME, isAppend);
+			fw.write(line);
 		 
 			fw.close();
 			
@@ -146,29 +248,8 @@ public class ResultAnalyzer {
 		}
 		 
 		return true;
-		
-	}
-
-	
-	private String getRelativePath (String absolutePath) {
-		String currentDirectory = getCurrentDirectory();
-		String relativePath = absolutePath.replaceFirst(currentDirectory, "");
-		return relativePath;
 	}
 	
-	private String getCurrentDirectory() {
-		File currentDirectory = new File(new File(".").getAbsolutePath());
-		String currentPath = null;
-		
-		try {
-			currentPath = currentDirectory.getCanonicalPath();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			return null;
-		}
-		return currentPath;
-	}
 
 	/**
 	 * @param file
@@ -320,9 +401,68 @@ public class ResultAnalyzer {
 	
 	private boolean processCategoryName(String categoryName) {
 		categoryName = categoryName.trim().toLowerCase();
-		String fileName = groundTruthFileNamesPrefix + categoryName;
+		String fileName = groundTruthFileNamesPrefix + categoryName + groundTruthFileExtension;
 		_groundTruthFileNames.add(fileName);
 		return true;
+	}
+
+	public static void main(String[] args) {
+		ResultAnalyzer analyzer = new ResultAnalyzer();
+		analyzer.writeToResultFile("", false);
+		
+		generateTestImageFilepaths(PATH_OUTPUT_FPATHS);
+		
+		
+		Vector <String> testImages = analyzer.getTestImageFilePaths(PATH_OUTPUT_FPATHS);
+		
+		VisualConceptGenerator concept = VisualConceptGenerator.getObject();
+		TextRecognizer text = TextRecognizer.getObject();
+		SiftFeatureComparer sift = SiftFeatureComparer.getObject();
+				
+		/*
+		analyzer.writeToResultFile("#analyzing using concepts only\n\n");
+		
+		for (int i = 0; i < testImages.size(); i++) {
+			String testImage = testImages.get(i);
+			File file = new File(testImage);
+			TreeSet<String> resultImageSet = concept.getTreeSetResultImageList(file);
+			if (resultImageSet == null) {
+				analyzer.writeToResultFile("error in reading file\n");
+				continue;
+			}
+			
+			analyzer.generateAnalysisResult(file, resultImageSet);
+		}
+		
+		analyzer.writeToResultFile("\n\n\n#analyzing using text only\n\n");
+		
+		for (int i = 0; i < testImages.size(); i++) {
+			String testImage = testImages.get(i);
+			File file = new File(testImage);
+			TreeSet<String> resultImageSet = text.getTreeSetResultImageList(file);
+			if (resultImageSet == null) {
+				analyzer.writeToResultFile("error in reading file\n");
+				continue;
+			}
+			
+			analyzer.generateAnalysisResult(file, resultImageSet);
+		}
+		*/
+
+		analyzer.writeToResultFile("\n\n\n#analyzing using visual words only\n\n");
+		
+		for (int i = 0; i < testImages.size(); i++) {
+			String testImage = testImages.get(i);
+			File file = new File(testImage);
+			TreeSet<String> resultImageSet = sift.getTreeSetResultImageList(file);
+			if (resultImageSet == null) {
+				analyzer.writeToResultFile("error in reading file\n");
+				continue;
+			}
+			
+			analyzer.generateAnalysisResult(file, resultImageSet);
+		}
+
 	}
 	
 }

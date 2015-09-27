@@ -8,7 +8,7 @@ def build(training_dir, output_file):
 	for root, dirs, files in os.walk(training_dir):
 		for file in files:
 			if file.endswith(".jpg"):
-				filepaths.append(os.path.join(root, file))
+				filepaths.append(os.path.abspath(os.path.join(root, file)))
 
 	with open(output_file, "w+") as f:
 		for filepath in filepaths:
