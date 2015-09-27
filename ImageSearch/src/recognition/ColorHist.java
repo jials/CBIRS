@@ -3,25 +3,153 @@ import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.io.File;
 import java.io.IOException;
+import java.util.TreeSet;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
 
 public class ColorHist {
 	int dim = 64;
 
+	private static final String[] KEYWORDS = {"bear", "birds", "boats",
+	 	  "cars", "cat", "computer", "coral", 
+	 	  "dog",
+	 	  "fish", "flags", "flowers", 
+	 	  "horses", 
+	 	  "leaf", 
+	 	  "plane",
+	 	  "rainbow", "rocks",
+	 	  "sign", "snow",
+	 	  "tiger", "tower", "train", "tree", 
+	 	  "whales", "window",
+	 	  "zebra"};
+	private static final int TOPN = 20;
 	
-	public BufferedImage[] search(String datasetpath, BufferedImage bufferedimage, int resultsize) throws IOException{
-    	double[] hist = getHist(bufferedimage);
+	private static ColorHist _colorHist = null;
+	
+	private String _datasetpath = "ImageData/train/data/";
+	
+	private ColorHist() {
+	}
+	
+	public static ColorHist getObject() {
+		if (_colorHist == null) {
+			_colorHist = new ColorHist();
+		}
+		return _colorHist;
+	}
+	
+	public BufferedImage[] searchByColorHistogram(File file) throws IOException {
+		BufferedImage bufferedimage = ImageIO.read(file);
+		BufferedImage[] imgs = null;
+
+		//imgs = colorhist.search(datasetpath + KEYWORDS[0], bufferedimage, resultsize);
+		Vector <File> fileVector = new Vector <File>();
+		for (int i = 0; i < KEYWORDS.length; i++) {
+			String datasetpath = _datasetpath + KEYWORDS[i];
+			File dir = new File(datasetpath);  //path of the dataset
+			File [] files = dir.listFiles();
+			for (int j = 0; j < files.length; j++) {
+				fileVector.add(files[j]);
+			}
+		}
+		
+		imgs = search(fileVector, bufferedimage, TOPN);
+
+		return imgs;
+	}
+	
+	public TreeSet<String> getTreeSetResultImageList(File file) {
+		BufferedImage bufferedimage;
+		try {
+			bufferedimage = ImageIO.read(file);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return null;
+		}
+
+		//imgs = colorhist.search(datasetpath + KEYWORDS[0], bufferedimage, resultsize);
+		Vector <File> fileVector = new Vector <File>();
+		for (int i = 0; i < KEYWORDS.length; i++) {
+			String datasetpath = _datasetpath + KEYWORDS[i];
+			File dir = new File(datasetpath);  //path of the dataset
+			File [] files = dir.listFiles();
+			for (int j = 0; j < files.length; j++) {
+				fileVector.add(files[j]);
+			}
+		}
+		
+		double[] hist = getHist(bufferedimage);
     	
-    	File dir = new File(datasetpath);  //path of the dataset
-		File [] files = dir.listFiles();
-		double[] sims = new double [files.length];
-		int [] indexes = new int [files.length];
+    	
+		
+		double[] sims = new double [fileVector.size()];
+		int [] indexes = new int [fileVector.size()];
 		
 		
 		/*ranking the search results*/
-		for (int count=0; count < files.length;count++){
-			BufferedImage i = ImageIO.read(files[count]);
+		for (int count=0; count < fileVector.size() ;count++){
+			BufferedImage i = null;
+			try {
+				i = ImageIO.read(fileVector.get(count));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				continue;
+			}
+			
+			if (i == null) {
+				continue;
+			}
+			
+			double[] h = getHist(i);
+			double sim = computeSimilarity (hist, h);
+			if (count == 0){
+				sims[count] = sim;
+				indexes [count] = count;
+			}
+			else {
+				int index;
+				for (index =0; index < count; index ++){
+					if (sim > sims[index])
+						break;
+				}
+				for (int j = count - 1; j > index - 1; j--){
+					sims [j+1] = sims [j];
+					indexes [j+1] = indexes[j];
+				}
+				sims[index] = sim;
+				indexes[index] = count;
+			}
+		}
+		
+		TreeSet <String> resultSet = new TreeSet <String>();
+		for (int i = 0; i < TOPN; i++) {
+			int index = indexes[i];
+			String filePath = fileVector.get(index).getAbsolutePath();
+			resultSet.add(filePath);
+		}
+		return resultSet;
+	}
+	
+	public BufferedImage[] search(Vector<File> files, BufferedImage bufferedimage, int resultsize) throws IOException{
+    	double[] hist = getHist(bufferedimage);
+    	
+    	
+		
+		double[] sims = new double [files.size()];
+		int [] indexes = new int [files.size()];
+		
+		
+		/*ranking the search results*/
+		for (int count=0; count < files.size() ;count++){
+			BufferedImage i = ImageIO.read(files.get(count));
+			
+			if (i == null) {
+				continue;
+			}
+			
 			double[] h = getHist(i);
 			double sim = computeSimilarity (hist, h);
 			if (count == 0){
@@ -45,7 +173,7 @@ public class ColorHist {
 		    	
     	BufferedImage[] imgs = new BufferedImage[resultsize];
 		for (int i=0; i<resultsize;i++){
-			imgs [i]=ImageIO.read(files[indexes[i]]);
+			imgs [i]=ImageIO.read(files.get(indexes[i]));
 		}
 		
     	return imgs;
