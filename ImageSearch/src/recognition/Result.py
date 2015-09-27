@@ -34,15 +34,17 @@ def build(dictionary_dir, scores_file):
 
 	result = []
 	for conceptId, score in output:
-		if len(result) < 31:
-			result.extend(conceptId_to_nameScore[conceptId])
+		if len(result) < 21:
+			result.extend(conceptId_to_name[conceptId])
 		else:
 			break
 	
-	if len(result) < 31:
-		print result
+	if len(result) < 21:
+		for e in result:
+			print e
 	else:
-		print result[:31]
+		for i in range(0, 21)
+			print result[i]
 
 
 def usage():

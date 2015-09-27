@@ -181,8 +181,7 @@ public class ImageSearch extends JFrame implements ActionListener {
 	
 	private BufferedImage[] searchByConcepts() throws IOException {
 		VisualConceptGenerator concept = VisualConceptGenerator.getObject();
-		concept.classifyInputImage(file);
-		return null;
+		return concept.classifyInputImage(file);
 	}
 
 	private BufferedImage[] searchBySift() throws IOException {
