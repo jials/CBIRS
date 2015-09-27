@@ -23,6 +23,8 @@ def build(dictionary_dir, scores_file):
 						# conceptId_to_nameScore[count].append((nameScores[i], nameScores[i+1]))
 			count += 1
 
+        #print conceptId_to_name
+    
 	with open(scores_file, "r") as f:
 		indices = range(INITIAL_INDEX, FINAL_INDEX)
 		for line in f:
@@ -43,7 +45,7 @@ def build(dictionary_dir, scores_file):
 		for e in result:
 			print e
 	else:
-		for i in range(0, 21)
+		for i in range(0, 21):
 			print result[i]
 
 

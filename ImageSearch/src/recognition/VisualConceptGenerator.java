@@ -14,7 +14,7 @@ import java.util.Vector;
 import javax.imageio.ImageIO;
 
 public class VisualConceptGenerator {
-	private static final String PATH_PYTHON_RESULT = "Result.py";
+	private static final String PATH_PYTHON_RESULT = "src/recognition/Result.py";
 	private static final String PATH_DICT = "ImageData/train/dictionary.txt"; 
 	private static final int TOP_20_RESULTS = 20;
 	
@@ -95,7 +95,7 @@ public class VisualConceptGenerator {
 
 		
 		BufferedImage imgs[] = new BufferedImage[TOP_20_RESULTS];
-		for (int i = 0; i < _results.size(); i++) {
+		for (int i = 0; i < Math.min(_results.size(), imgs.length); i++) {
 			File imgFile = new File(_results.get(i));
 			imgs[i] = ImageIO.read(imgFile);			
 		}
@@ -108,6 +108,7 @@ public class VisualConceptGenerator {
 	 */
 	private void generateResult(String filePath) {
 		String filePathTxt = filePath.replace(".jpg", ".txt");
+		System.err.println("Concept: generateResult: filePath: " + filePath);
 		try {
 			Process process = Runtime.getRuntime().exec("python " + PATH_PYTHON_RESULT + " -d " + PATH_DICT + " -s " + filePathTxt);
 			InputStream is = process.getInputStream();
@@ -117,10 +118,13 @@ public class VisualConceptGenerator {
 			
 			while ((line = br.readLine()) != null) {
 				System.out.println(line);
+				line = line.replace(".txt", ".jpg");
 				_results.add(line);
 			}
 		} catch (IOException e) {
+			e.printStackTrace();
 			System.out.println("Error calling Python Result.py script!");
 		}
 	}
+	
 }

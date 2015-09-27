@@ -146,9 +146,12 @@ public class ImageSearch extends JFrame implements ActionListener {
 			BufferedImage[] imgs = null;
 			try {
 				boolean isSift = false;
+				boolean isConcept = true;
 				
 				if (isSift) {
 					imgs = searchBySift();
+				} else if (isConcept) {
+					imgs = searchByConcepts();
 				} else {
 					imgs = searchByText();
 				}

@@ -139,14 +139,14 @@ public class ResultAnalyzer {
 		initializeCategoriesOfImagesTrain();
 	}
 
-	public boolean generateAnalysisResult(File file, TreeSet <String> resultImageSetInitial) {
+	public StatisticObject generateAnalysisResult(File file, TreeSet <String> resultImageSetInitial) {
 		String testImageRelativePath = null;
 		try {
 			testImageRelativePath = file.getCanonicalPath();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return false;
+			return null;
 		}
 
 		String testImageName = extractImageName(testImageRelativePath).trim();
@@ -164,7 +164,7 @@ public class ResultAnalyzer {
 	
 		
 		if (categories == null) {
-			return false;
+			return null;
 		}
 		
 		for (int i = 0; i < categories.size(); i++) {
@@ -187,14 +187,14 @@ public class ResultAnalyzer {
 		double fn = (double) correctImageSet.size() - tp;
 		
 		
-		double precission = tp / (tp + fp);
+		double precision = tp / (tp + fp);
 		double recall = tp / (tp + fn);
 		
 		//2PR/ (P+R)
-		double f1 = 2 * precission * recall / (precission + recall);
+		double f1 = 2 * precision * recall / (precision + recall);
 		
 		//Pre = top/down
-		double avgPrecissions = 0;
+		double avgPrecisions = 0;
 		double top = 0;
 		double down = 0;
 		String resultImagesString = " Result Images:";
@@ -207,22 +207,31 @@ public class ResultAnalyzer {
 			} else {
 				down += 1;
 			}
-			double avgPrecission = top/down;
-			avgPrecissions += avgPrecission;
+			double avgPrecision = top/down;
+			avgPrecisions += avgPrecision;
 		}
 
-		double mapAtTOPN = avgPrecissions / (double) Math.min(TOPN, resultImageSet.size());
+		double mapAtTOPN = avgPrecisions / (double) Math.min(TOPN, resultImageSet.size());
+		
+		StatisticObject object = new StatisticObject(precision, 
+													 recall,
+													 f1,
+													 Math.min(TOPN, resultImageSet.size()),
+													 mapAtTOPN);
 		
 		String outputLine = "Test Image: " + testImageRelativePath +
-				            " Precission: " + precission +
+				            " Precision: " + precision +
 				            " Recall: " + recall +
 				            " F1: " + f1 +
 				            " N: " + Math.min(TOPN, resultImageSet.size()) + 
 				            " MAP@N: " + mapAtTOPN +
 				            resultImagesString + "\n";
 				            
-		return writeToResultFile(outputLine);
+		if (!writeToResultFile(outputLine)) {
+			return null;
+		}
 		
+		return object;
 	}
 
 	/**
@@ -415,11 +424,13 @@ public class ResultAnalyzer {
 		
 		Vector <String> testImages = analyzer.getTestImageFilePaths(PATH_OUTPUT_FPATHS);
 		
-		VisualConceptGenerator concept = VisualConceptGenerator.getObject();
+		//VisualConceptGenerator concept = VisualConceptGenerator.getObject();
 		TextRecognizer text = TextRecognizer.getObject();
-		SiftFeatureComparer sift = SiftFeatureComparer.getObject();
+		//SiftFeatureComparer sift = SiftFeatureComparer.getObject();
 				
+		Vector <StatisticObject> statisticalObjectsText = new Vector <StatisticObject>();
 		
+		/*
 		analyzer.writeToResultFile("#analyzing using concepts only\n\n");
 		
 		for (int i = 0; i < testImages.size(); i++) {
@@ -431,10 +442,11 @@ public class ResultAnalyzer {
 				continue;
 			}
 			
-			analyzer.generateAnalysisResult(file, resultImageSet);
+			StatisticObject object = analyzer.generateAnalysisResult(file, resultImageSet);
 		}
+		*/
+
 		
-		/*
 		analyzer.writeToResultFile("\n\n\n#analyzing using text only\n\n");
 		
 		for (int i = 0; i < testImages.size(); i++) {
@@ -446,10 +458,13 @@ public class ResultAnalyzer {
 				continue;
 			}
 			
-			analyzer.generateAnalysisResult(file, resultImageSet);
+			StatisticObject object = analyzer.generateAnalysisResult(file, resultImageSet);
+			statisticalObjectsText.add(object);
 		}
+		String outputLine = AverageAndSdCalculator.getStatisticResult(statisticalObjectsText);
+		analyzer.writeToResultFile(outputLine);
 		
-
+		/*
 		analyzer.writeToResultFile("\n\n\n#analyzing using visual words only\n\n");
 		
 		for (int i = 0; i < testImages.size(); i++) {

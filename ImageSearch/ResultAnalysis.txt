@@ -1,4 +1,0 @@
-#analyzing using concepts only
-
-Test Image: C:\code_projects\CBIRS\ImageSearch\ImageData\test\data\bear\0018_375723120.jpg Precission: NaN Recall: 0.0 F1: NaN N: 0 MAP@N: NaN Result Images:
-Test Image: C:\code_projects\CBIRS\ImageSearch\ImageData\test\data\bear\0087_2173846805.jpg Precission: NaN Recall: 0.0 F1: NaN N: 0 MAP@N: NaN Result Images:

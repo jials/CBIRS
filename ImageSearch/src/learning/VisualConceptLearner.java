@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 
 public class VisualConceptLearner {
 	
-	private static final String PATH_PYTHON_LEARNER = "VisualConceptLearner.py";
+	private static final String PATH_PYTHON_LEARNER = "src/learning/VisualConceptLearner.py";
 	private static final String PATH_PYTHON_FPGENERATOR = "src/learning/FilepathsGenerator.py";
 	private static final String PATH_TRAIN = "ImageData/train/data";
 	private static final String PATH_OUTPUT_DICT = "ImageData/train/dictionary.txt";
@@ -77,6 +77,7 @@ public class VisualConceptLearner {
 	
 	public static void main(String[] args) {
 		VisualConceptLearner visual = new VisualConceptLearner();
-		visual.classifyDatabase();
+		//visual.classifyDatabase();
+		visual.generateVisualConceptDict();
 	}
 }
