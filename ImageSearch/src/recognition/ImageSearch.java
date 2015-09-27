@@ -178,6 +178,12 @@ public class ImageSearch extends JFrame implements ActionListener {
 			System.out.println(_textbox.getText());
 		}
 	}
+	
+	private BufferedImage[] searchByConcepts() throws IOException {
+		VisualConceptGenerator concept = VisualConceptGenerator.getObject();
+		concept.classifyInputImage(file);
+		return null;
+	}
 
 	private BufferedImage[] searchBySift() throws IOException {
 		SiftFeatureComparer sift = SiftFeatureComparer.getObject();

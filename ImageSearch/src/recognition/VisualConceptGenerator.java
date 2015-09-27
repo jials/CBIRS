@@ -2,6 +2,7 @@ package recognition;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,12 +12,25 @@ public class VisualConceptGenerator {
 	private static final String PATH_PYTHON_RESULT = "Result.py";
 	private static final String PATH_DICT = "ImageData/train/dictionary.txt"; 
 	
+	private static VisualConceptGenerator _concepts = null;
+	
+	private VisualConceptGenerator() {
+	}
+	
+	public static VisualConceptGenerator getObject() {
+		if (_concepts == null) {
+			_concepts = new VisualConceptGenerator();
+		}
+		return _concepts;
+	}
+	
 	/**
 	 * This class will requires filePath of the provided image in order to generate a input.txt
 	 * for image_classification.exe to generate list of scores of 1000-concepts. It will then run 
 	 * image_classification.exe. 
 	 */
-	public void classifyInputImage(String filePath) {
+	public void classifyInputImage(File file) {
+		String filePath = file.getAbsolutePath();
 		BufferedWriter bw;
 		try {
 			bw = new BufferedWriter(new FileWriter("SemanticFeature/input.txt"));
