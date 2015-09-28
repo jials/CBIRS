@@ -59,7 +59,7 @@ public class ColorHist {
 		return imgs;
 	}
 	
-	public TreeSet<String> getTreeSetResultImageList(File file) {
+	public TreeSet<String> getTreeSetResultImageList(Vector <File> fileVector, File file) {
 		BufferedImage bufferedimage;
 		try {
 			bufferedimage = ImageIO.read(file);
@@ -67,17 +67,6 @@ public class ColorHist {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			return null;
-		}
-
-		//imgs = colorhist.search(datasetpath + KEYWORDS[0], bufferedimage, resultsize);
-		Vector <File> fileVector = new Vector <File>();
-		for (int i = 0; i < KEYWORDS.length; i++) {
-			String datasetpath = _datasetpath + KEYWORDS[i];
-			File dir = new File(datasetpath);  //path of the dataset
-			File [] files = dir.listFiles();
-			for (int j = 0; j < files.length; j++) {
-				fileVector.add(files[j]);
-			}
 		}
 		
 		double[] hist = getHist(bufferedimage);
@@ -131,6 +120,43 @@ public class ColorHist {
 			resultSet.add(filePath);
 		}
 		return resultSet;
+	}
+
+	
+	
+	public TreeSet<String> getTreeSetResultImageList(File file) {
+		
+
+		//imgs = colorhist.search(datasetpath + KEYWORDS[0], bufferedimage, resultsize);
+		Vector <File> fileVector = new Vector <File>();
+		for (int i = 0; i < KEYWORDS.length; i++) {
+			String datasetpath = _datasetpath + KEYWORDS[i];
+			File dir = new File(datasetpath);  //path of the dataset
+			File [] files = dir.listFiles();
+			for (int j = 0; j < files.length; j++) {
+				fileVector.add(files[j]);
+			}
+		}
+		
+		
+		return getTreeSetResultImageList(fileVector, file);
+	}
+	
+	public BufferedImage[] search(Vector<File> files, File bufferedimageFile) throws IOException{
+		return search(files, bufferedimageFile, TOPN);
+	}
+	
+	
+	public BufferedImage[] search(Vector<File> files, File bufferedimageFile, int resultsize) throws IOException{
+		BufferedImage bufferedimage;
+		try {
+			bufferedimage = ImageIO.read(bufferedimageFile);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return null;
+		}
+		return search(files, bufferedimage, resultsize);
 	}
 	
 	public BufferedImage[] search(Vector<File> files, BufferedImage bufferedimage, int resultsize) throws IOException{

@@ -217,6 +217,42 @@ public class SiftFeatureComparer {
 		Vector <Integer> topKnnImages = findNearestImages(curImageSet);
 		return topKnnImages;
 	}
+	
+	public TreeSet <String> findNearestImagePaths(TreeSet<String> curImageSet) {
+		Vector <DoubleStringPair> doubleStringPairs = new Vector <DoubleStringPair>();
+		
+		while (!curImageSet.isEmpty()) {
+			String second = curImageSet.pollFirst().trim();
+			
+			int index = -1;
+			for (int i = 0; i < _imageNames.size(); i++) {
+				if (second.equals(_imageNames.get(i))) {
+					index = i;
+					break;
+				}
+			}
+			
+			if (index == -1) {
+				System.err.println("Error in extracting images");
+				System.err.println(second);
+				System.err.println(_imageNames);
+				return null;
+			}
+			
+			double first = calculateEuclideanDistance(_histogramOfCurrentImage, _visualWordHistogramOfImages.get(index));
+			
+			DoubleStringPair doubleStringPair = new DoubleStringPair(first, second);
+			doubleStringPairs.add(doubleStringPair);
+		}
+		Collections.sort(doubleStringPairs, new DoubleStringPair.SortFirstDouble());
+		
+		
+		TreeSet <String> topKnnImages = new TreeSet <String>();
+		for (int i = 0; i < Math.min(TOP_KNN, doubleStringPairs.size()); i++) {
+			topKnnImages.add(doubleStringPairs.get(i).getSecond());
+		}
+		return topKnnImages;
+	}
 
 	/**
 	 * @param curImageSet

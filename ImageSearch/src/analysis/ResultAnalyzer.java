@@ -12,6 +12,7 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import recognition.ColorHist;
+import recognition.MixedFeaturesRecognizer;
 import recognition.SiftFeatureComparer;
 import recognition.TextRecognizer;
 import recognition.VisualConceptGenerator;
@@ -226,14 +227,14 @@ equal to x: r >= x. If not, change in recall is 1/r for each correct i instead o
 		StatisticObject object = new StatisticObject(precision, 
 													 recall,
 													 f1,
-													 Math.min(TOPN, resultImageSet.size()),
+													 size,
 													 mapAtTOPN);
 		
 		String outputLine = "Test Image: " + testImageRelativePath +
 				            " Precision: " + precision +
 				            " Recall: " + recall +
 				            " F1: " + f1 +
-				            " N: " + Math.min(TOPN, resultImageSet.size()) + 
+				            " N: " + size + 
 				            " MAP@N: " + mapAtTOPN +
 				            resultImagesString + "\n";
 				            
@@ -434,7 +435,10 @@ equal to x: r >= x. If not, change in recall is 1/r for each correct i instead o
 		
 		Vector <String> testImages = analyzer.getTestImageFilePaths(PATH_OUTPUT_FPATHS);
 		
-				
+		for (int i = 0; i < testImages.size(); i++) {
+			System.out.println(testImages.get(i));
+		}
+		String outputLine;
 		
 		/*
 		VisualConceptGenerator concept = VisualConceptGenerator.getObject();
@@ -502,6 +506,7 @@ equal to x: r >= x. If not, change in recall is 1/r for each correct i instead o
 		analyzer.writeToResultFile(outputLine);
 		*/
 		
+		/*
 		ColorHist colorHist = ColorHist.getObject();
 		Vector <StatisticObject> statisticalObjectsColor = new Vector <StatisticObject>();
 
@@ -522,6 +527,71 @@ equal to x: r >= x. If not, change in recall is 1/r for each correct i instead o
 		}
 		String outputLine = AverageAndSdCalculator.getStatisticResult(statisticalObjectsColor);
 		analyzer.writeToResultFile(outputLine);
+		*/
+		
+		MixedFeaturesRecognizer mixed = MixedFeaturesRecognizer.getObject();
+		Vector <StatisticObject> statisticalObjectsMixed = new Vector <StatisticObject>();
+
+		
+
+		analyzer.writeToResultFile("\n\n\n#analyzing using mixed features: concept + sift\n\n");
+		
+		for (int i = 0; i < testImages.size(); i++) {
+			String testImage = testImages.get(i);
+			File file = new File(testImage);
+			TreeSet<String> resultImageSet = mixed.extractTreeSetConceptsSift(file);
+			if (resultImageSet == null) {
+				analyzer.writeToResultFile("error in reading file\n");
+				continue;
+			}
+			
+			StatisticObject object = analyzer.generateAnalysisResult(file, resultImageSet);
+			statisticalObjectsMixed.add(object);
+		}
+		outputLine = AverageAndSdCalculator.getStatisticResult(statisticalObjectsMixed);
+		analyzer.writeToResultFile(outputLine);
+		
+		statisticalObjectsMixed.clear();
+		
+		/*
+		analyzer.writeToResultFile("\n\n\n#analyzing using mixed features: concept + color\n\n");
+		
+		for (int i = 0; i < testImages.size(); i++) {
+			String testImage = testImages.get(i);
+			File file = new File(testImage);
+			TreeSet<String> resultImageSet = mixed.extractTreeSetConceptsColor(file);
+			if (resultImageSet == null) {
+				analyzer.writeToResultFile("error in reading file\n");
+				continue;
+			}
+			
+			StatisticObject object = analyzer.generateAnalysisResult(file, resultImageSet);
+			statisticalObjectsMixed.add(object);
+		}
+		outputLine = AverageAndSdCalculator.getStatisticResult(statisticalObjectsMixed);
+		analyzer.writeToResultFile(outputLine);
+		
+		statisticalObjectsMixed.clear();
+		
+		analyzer.writeToResultFile("\n\n\n#analyzing using mixed features: concept + text\n\n");
+		
+		for (int i = 0; i < testImages.size(); i++) {
+			String testImage = testImages.get(i);
+			File file = new File(testImage);
+			TreeSet<String> resultImageSet = mixed.extractTreeSetConceptsText(file);
+			if (resultImageSet == null) {
+				analyzer.writeToResultFile("error in reading file\n");
+				continue;
+			}
+			
+			StatisticObject object = analyzer.generateAnalysisResult(file, resultImageSet);
+			statisticalObjectsMixed.add(object);
+		}
+		outputLine = AverageAndSdCalculator.getStatisticResult(statisticalObjectsMixed);
+		analyzer.writeToResultFile(outputLine);
+		
+		statisticalObjectsMixed.clear();
+		*/
 	}
 	
 }
