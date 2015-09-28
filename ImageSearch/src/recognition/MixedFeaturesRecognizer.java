@@ -15,10 +15,10 @@ public class MixedFeaturesRecognizer {
 	private static MixedFeaturesRecognizer _mixedFeaturesRecognizer = null;
 	private final int TOP_KNN = 20;
 	
-	private final static double CONSTANT_CONCEPT = 0.1;
+	private final static double CONSTANT_CONCEPT = 0.3;
 	private final static double CONSTANT_TEXT = 0.2;
-	private final static double CONSTANT_COLOR = 0.3;
-	private final static double CONSTANT_SIFT = 0.3;
+	private final static double CONSTANT_COLOR = 0.1;
+	private final static double CONSTANT_SIFT = 0.1;
 	
 	private MixedFeaturesRecognizer() {
 	}
@@ -58,7 +58,7 @@ public class MixedFeaturesRecognizer {
 		TreeMap <String, Integer> nameIndexMap = new TreeMap<String, Integer>();
 		Vector <DoubleStringPair> fileWeight = new Vector <DoubleStringPair>();
 		
-		int weight = 1;
+		int weight = initialImageList.size();
 		while (!initialImageList.isEmpty()) {
 			String imagePath = initialImageList.pollFirst();
 			if (nameIndexMap.containsKey(imagePath)) {
@@ -74,10 +74,14 @@ public class MixedFeaturesRecognizer {
 				fileWeight.add(newPair);
 				nameIndexMap.put(fileName, index);
 			}
-			weight++;
+			weight--;
 		}
 		
-		weight = 1;
+		if (nextImageList == null) {
+			return initialImageList;
+		}
+		
+		weight = nextImageList.size();
 		while (!nextImageList.isEmpty()) {
 			String imagePath = nextImageList.pollFirst();
 			if (nameIndexMap.containsKey(imagePath)) {
@@ -93,7 +97,7 @@ public class MixedFeaturesRecognizer {
 				fileWeight.add(newPair);
 				nameIndexMap.put(fileName, index);
 			}
-			weight++;
+			weight--;
 		}
 		Collections.sort(fileWeight, new DoubleStringPair.SortFirstDouble());
 		
@@ -120,7 +124,7 @@ public class MixedFeaturesRecognizer {
 		TreeMap <String, Integer> nameIndexMap = new TreeMap<String, Integer>();
 		Vector <DoubleStringPair> fileWeight = new Vector <DoubleStringPair>();
 		
-		int weight = 1;
+		int weight = initialImageList.size();
 		while (!initialImageList.isEmpty()) {
 			String imagePath = initialImageList.pollFirst();
 			if (nameIndexMap.containsKey(imagePath)) {
@@ -136,10 +140,10 @@ public class MixedFeaturesRecognizer {
 				fileWeight.add(newPair);
 				nameIndexMap.put(fileName, index);
 			}
-			weight++;
+			weight--;
 		}
 		
-		weight = 1;
+		weight = nextImageList.size();
 		while (!nextImageList.isEmpty()) {
 			String imagePath = nextImageList.pollFirst();
 			if (nameIndexMap.containsKey(imagePath)) {
@@ -155,13 +159,13 @@ public class MixedFeaturesRecognizer {
 				fileWeight.add(newPair);
 				nameIndexMap.put(fileName, index);
 			}
-			weight++;
+			weight--;
 		}
 		Collections.sort(fileWeight, new DoubleStringPair.SortFirstDouble());
 		
 		TreeSet<String> resultImageList = new TreeSet<String>();
 		
-		for (int i = fileWeight.size() - 1; i >= fileWeight.size() - TOP_KNN; i--) {
+		for (int i = 0; i < TOP_KNN; i++) {
 			resultImageList.add(fileWeight.get(i).getSecond());
 			System.out.println(fileWeight.get(i).getFirst());
 		}
@@ -194,13 +198,25 @@ public class MixedFeaturesRecognizer {
 		TreeSet<String> initialImageList = concept.getTreeSetResultImageList(file);
 		
 		String head = initialImageList.pollFirst();
-		int fileNameStart = head.lastIndexOf("/") + 1;
+		int fileNameStart = head.lastIndexOf("\\");
 		String filePath = head.substring(0, fileNameStart);
+		
+		System.out.println("2: " + filePath);
+		
 		File fileDir = new File(filePath);
 		File[] fileArray = fileDir.listFiles();
 		Vector <File> files = new Vector <File>();
 		
 		for (int i = 0; i < fileArray.length; i++) {
+			String tempFileName = fileArray[i].getAbsolutePath();
+			System.out.println("1: " + tempFileName);
+
+			
+			if (!tempFileName.endsWith(".jpg")) {
+				continue;
+			}
+			
+			
 			files.add(fileArray[i]);
 		}
 		

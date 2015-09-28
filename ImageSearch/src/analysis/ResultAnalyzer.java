@@ -506,7 +506,7 @@ equal to x: r >= x. If not, change in recall is 1/r for each correct i instead o
 		analyzer.writeToResultFile(outputLine);
 		*/
 		
-		/*
+		
 		ColorHist colorHist = ColorHist.getObject();
 		Vector <StatisticObject> statisticalObjectsColor = new Vector <StatisticObject>();
 
@@ -525,15 +525,16 @@ equal to x: r >= x. If not, change in recall is 1/r for each correct i instead o
 			StatisticObject object = analyzer.generateAnalysisResult(file, resultImageSet);
 			statisticalObjectsColor.add(object);
 		}
-		String outputLine = AverageAndSdCalculator.getStatisticResult(statisticalObjectsColor);
+		outputLine = AverageAndSdCalculator.getStatisticResult(statisticalObjectsColor);
 		analyzer.writeToResultFile(outputLine);
-		*/
 		
+		
+		/*
 		MixedFeaturesRecognizer mixed = MixedFeaturesRecognizer.getObject();
 		Vector <StatisticObject> statisticalObjectsMixed = new Vector <StatisticObject>();
-
+		*/
 		
-
+		/*
 		analyzer.writeToResultFile("\n\n\n#analyzing using mixed features: concept + sift\n\n");
 		
 		for (int i = 0; i < testImages.size(); i++) {
@@ -552,7 +553,7 @@ equal to x: r >= x. If not, change in recall is 1/r for each correct i instead o
 		analyzer.writeToResultFile(outputLine);
 		
 		statisticalObjectsMixed.clear();
-		
+		*/
 		/*
 		analyzer.writeToResultFile("\n\n\n#analyzing using mixed features: concept + color\n\n");
 		
@@ -572,6 +573,8 @@ equal to x: r >= x. If not, change in recall is 1/r for each correct i instead o
 		analyzer.writeToResultFile(outputLine);
 		
 		statisticalObjectsMixed.clear();
+		*/
+		/*
 		
 		analyzer.writeToResultFile("\n\n\n#analyzing using mixed features: concept + text\n\n");
 		
