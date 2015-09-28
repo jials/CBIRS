@@ -50,6 +50,8 @@ public class VisualConceptGenerator {
 	 * @param file
 	 */
 	public boolean processResult(File file) {
+		_results.clear();
+		
 		String filePath = file.getAbsolutePath();
 		BufferedWriter bw;
 		try {

@@ -197,9 +197,32 @@ public class MixedFeaturesRecognizer {
 		
 		TreeSet<String> initialImageList = concept.getTreeSetResultImageList(file);
 		
-		String head = initialImageList.pollFirst();
-		int fileNameStart = head.lastIndexOf("\\");
-		String filePath = head.substring(0, fileNameStart);
+		Vector<StringIntegerPair> pairs = new Vector<StringIntegerPair>();
+		TreeMap<String, Integer> hasPath = new TreeMap<String, Integer>();
+		
+		System.out.println(initialImageList.size());
+		
+		String filePath = null;
+		while (!initialImageList.isEmpty()) {
+			String head = initialImageList.pollFirst();
+			int fileNameStart = head.lastIndexOf("\\");
+			String fileInPath = head.substring(0, fileNameStart);
+			
+			if (hasPath.containsKey(fileInPath)) {
+				int index = hasPath.get(fileInPath).intValue();
+				pairs.get(index).incrementInteger();
+			} else {
+				StringIntegerPair pair = new StringIntegerPair(fileInPath);
+				hasPath.put(fileInPath, pairs.size());
+				pairs.add(pair);
+			}
+		}
+		Collections.sort(pairs, new StringIntegerPair.SortInteger());
+		
+		if (pairs.size() == 0) {
+			return color.getTreeSetResultImageList(file);
+		}
+		filePath = pairs.get(0).getString();
 		
 		System.out.println("2: " + filePath);
 		

@@ -72,7 +72,12 @@ public class AverageAndSdCalculator {
 		for (int i = 0; i < size; i++) {
 			StatisticObject object = statisticObjects.get(i);
 			
+			if (object == null) {
+				continue;
+			}
+			
 			double precision = object.getPrecision();
+			
 			double precisionVarToken =  precision - avgPrecision;
 			precisionVarToken = precisionVarToken * precisionVarToken;
 			varPrecision += precisionVarToken;

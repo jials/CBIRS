@@ -17,7 +17,7 @@ public class ImageSearch extends JFrame implements ActionListener {
 	JFileChooser fc;
 	JPanel contentPane;
 
-	int resultsize = 9; // size of the searching result
+	int resultsize = 20; // size of the searching result
 
 	
 	
@@ -134,6 +134,7 @@ public class ImageSearch extends JFrame implements ActionListener {
 				boolean isSift = false;
 				boolean isConcept = false;
 				boolean isText = false;
+				boolean isColor = false;
 				
 				if (isSift) {
 					imgs = searchBySift();
@@ -141,8 +142,10 @@ public class ImageSearch extends JFrame implements ActionListener {
 					imgs = searchByConcepts();
 				} else if (isText) {
 					imgs = searchByText();
-				} else {
+				} else if (isColor) {
 					imgs = searchByColorHistogram();
+				} else {
+					imgs = searchByConceptsColor();
 				}
 				
 				if (imgs == null) {
@@ -170,6 +173,11 @@ public class ImageSearch extends JFrame implements ActionListener {
 		}
 	}
 	
+	private BufferedImage[] searchByConceptsColor() throws IOException {
+		MixedFeaturesRecognizer mix = MixedFeaturesRecognizer.getObject();
+		return mix.searchByConceptsAndColor(file);
+	}
+
 	private BufferedImage[] searchByConcepts() throws IOException {
 		VisualConceptGenerator concept = VisualConceptGenerator.getObject();
 		return concept.classifyInputImage(file);
